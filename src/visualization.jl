@@ -1,5 +1,5 @@
 
-function print_2Ddecision(lda::Lda, data::Matrix, output::String = "2Ddecision.png")
+function print_2Ddecision(lda::Lda, data::Matrix)
 
     #
     # Output result
