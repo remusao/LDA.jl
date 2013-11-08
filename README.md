@@ -2,7 +2,12 @@
 
 ## Overview
 
-
+This package implements Linear Discriminant Analysis with Fisher's dicriminant and Kernel Linear Discriminant Analysis
+with the following kernels:
+* Linear
+* Polynomial
+* Laplacian RBF
+* RBF
 
 ## Installation
 
@@ -13,7 +18,7 @@ Pkg.update()
 
 ## Usage
 
-```
+```julia
 using Vega
 using LDA
 
@@ -35,7 +40,7 @@ plot(x = reshape(x[1, :], size(x, 2)), y = reshape(x[2, :], size(x, 2)), group =
 ```julia
 # Try with linear kernel
 # This is the classic LDA algorithm
-lin = LDA.lda(x, y)
+lin = lda(x, y)
 print_2Ddecision(lin, data)
 ```
 
@@ -43,8 +48,11 @@ print_2Ddecision(lin, data)
 
 ```julia
 # Try with a RBF kernel and different sigmas
-rbf_res = LDA.lda(x, y, rbf, sigma)
+rbf_res = lda(x, y, rbf, sigma)
 print_2Ddecision(res, data)
 ```
 
+![rbf](example/rbf0_02.png)
+![rbf](example/rbfoverfit.png)
+![rbf](example/rbf0_4.png)
 ![rbf](example/rbf.png)
