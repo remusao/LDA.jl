@@ -1,7 +1,7 @@
 
 immutable Lda
     c::Integer
-    Astar
+    V::Matrix
     data::Matrix
     kernel::Function
 end
@@ -13,7 +13,7 @@ function project(lda::Lda, x::Vector, dim::Integer)
     for i = 1:n
         Kt[i] = lda.kernel(lda.data[:, i], x)
     end
-    return lda.Astar[:, 1:dim]' * Kt
+    return lda.V[:, 1:dim]' * Kt
 end
 
 
@@ -57,7 +57,7 @@ function lda(data::Matrix, labels::Vector, c::Integer = 2, kfun::Function = line
     Sw = 0
     for k = 1:c
         Gk = G[:, labels .== k]
-        Sw = Sw + Gk * (eye(nk[k]) - ones(nk[k], nk[k]) / nk[k]) * Gk'
+        Sw = Sw + Gk * (eye(Float64, nk[k]) - ones(Float64, nk[k], nk[k]) / nk[k]) * Gk'
     end
 
     # Compute interclass variance Sb
@@ -68,7 +68,8 @@ function lda(data::Matrix, labels::Vector, c::Integer = 2, kfun::Function = line
     M1 = G * (indic - ones(Float64, n, c))
     Sb = M1 * M1'
 
-    S, V = eig(Sb, Sw)
+    S, V = eig(inv(Sw) * Sb)
+    println(V[:, 1:2])
 
     return Lda(c, V, data, kernel)
 end

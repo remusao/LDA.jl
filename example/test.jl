@@ -1,5 +1,6 @@
 using Vega
 using LDA
+using DataFrames
 using RDatasets
 
 # Try with Iris
@@ -52,6 +53,9 @@ println("Printing results")
 print_2Ddecision(rbf_res, data, labels)
 
 # RBF 0.1
+t0 = time()
 rbf_res = lda(data, labels, 3, rbf, 0.1)
+t1 = time()
 println("Printing results")
 print_2Ddecision(rbf_res, data, labels)
+println(t1 - t0)
