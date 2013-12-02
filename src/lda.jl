@@ -32,6 +32,12 @@ function lda(data::Matrix, labels::Vector, c::Integer = 2, kfun::Function = line
     # Number of training samples
     n = size(data, 2)
 
+    # Count number of element in each class
+    nk = Array(Int, c)
+    for k = 1:c
+        nk[k] = nnz(labels .== k)
+    end
+
     # Defines Kernel function
     if karg == nothing
         kernel(x, y) = kfun(x, y)
@@ -39,68 +45,30 @@ function lda(data::Matrix, labels::Vector, c::Integer = 2, kfun::Function = line
         kernel(x, y) = kfun(x, y, karg)
     end
 
-    # Separates c classes
-    class = {}
-    for i = 1:c
-        push!(class, data[:, labels .== i])
-    end
-
-
-    # Compute Kj[m, n] = kernel(Xn, Xmj)
-    K = {}
-    for j = 1:c
-        Kj = Array(Float64, n, size(class[j], 2))
-        for i = 1:n
-            for m = 1:size(class[j], 2)
-                Kj[i, m] = kernel(data[:, i], class[j][:, m])
-            end
-        end
-        push!(K, Kj)
-    end
-
-
-    # Compute Mi
-    # Mij = 1/li * sum(k: 1 -> li) kernel(Xj, Xki)
-    M = {}
-    for i = 1:c
-        Mi = Array(Float64, n)
+    # Compute gram matrix
+    G = Array(Float64, n, n)
+    for i = 1:n
         for j = 1:n
-            for k = 1:size(class[i], 2)
-                Mi[j] += kernel(data[:, j], class[i][:, k])
-            end
+            G[i, j] = kernel(data[:, i], data[:, j])
         end
-        Mi /= size(class[i], 2)
-        push!(M, Mi)
     end
 
-
-    # Compute N
-    # sum(j = 1,2) Kj (I - 1lj) Kj'
-    N = 0
-    for j = 1:c
-        ksize = size(K[j], 2)
-        dsize = size(class[j], 2)
-        N += K[j] * (eye(ksize) - ones(ksize, ksize) / dsize) * K[j]'
+    # Compute intraclass variance Sw
+    Sw = 0
+    for k = 1:c
+        Gk = G[:, labels .== k]
+        Sw = Sw + Gk * (eye(nk[k]) - ones(nk[k], nk[k]) / nk[k]) * Gk'
     end
 
-    # Compute M*
-    Mstar = Array(Float64, n)
-    for j = 1:n
-        for k = 1:n
-            Mstar[k] = Mstar[k] + kernel(data[:, j], data[:, k])
-        end
-        Mstar[j] /= n
+    # Compute interclass variance Sb
+    indic = zeros(Float64, n, c)
+    for i = 1:n
+        indic[i, labels[i]] = 1 / nk[labels[i]]
     end
+    M1 = G * (indic - ones(Float64, n, c))
+    Sb = M1 * M1'
 
-    # M
-    Mtot = 0
-    for j = 1:c
-        Mtot = Mtot + size(class[j], 2) * (M[j] - Mstar) * (M[j] - Mstar)'
-    end
+    S, V = eig(Sb, Sw)
 
-    println(Mstar)
-    println(Mtot)
-    Astar = eigvecs(inv(N + 0.1 *  eye(size(N, 1))) * Mtot)
-
-    return Lda(c, Astar, data, kernel)
+    return Lda(c, V, data, kernel)
 end

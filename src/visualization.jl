@@ -17,4 +17,3 @@ function print_2Ddecision(lda::Lda, data::Matrix, labels = nothing)
         println(plot(x = x, y = y, group = labels, kind = :scatter))
     end
 end
-
