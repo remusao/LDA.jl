@@ -21,38 +21,39 @@ Pkg.update()
 ```julia
 using Vega
 using LDA
+using RDatasets
 
-# Declare data
-x = [[0 0 0 0 0 1 1 2 2 2 2 2 3 3 3 3 3 4 4 4 4 4 5 5 6 6 6 6 6],
-     [1 2 3 4 5 0 6 0 2 3 4 6 0 2 3 4 6 0 2 3 4 6 0 6 1 2 3 4 5]]
+# Try with Iris
+iris = data("datasets", "iris")
 
-# Labels (-1 or +1)
-y = [-1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1]
+# Create data matrix
+data = matrix(iris[:, 2:5])'
 
-# Random data to test with unknown labels
-data = rand(2, 1000) * 7
+# Create labels vector
+labels = Array(Int, size(data, 2))
+for i = 1:size(data, 2)
+    x = iris[:, 6][i]
+    if x == "setosa"
+        labels[i] = 1
+    elseif x == "virginica"
+        labels[i] = 2
+    else
+        labels[i] = 3
+    end
+end
 
-plot(x = reshape(x[1, :], size(x, 2)), y = reshape(x[2, :], size(x, 2)), group = y, kind = :scatter)
+# lineaire
+rbf_res = lda(data, labels, 3, linear)
+println("Printing results")
+print_2Ddecision(rbf_res, data, labels)
+
+
+# RBF 0.4
+rbf_res = lda(data, labels, 3, rbf, 0.4)
+println("Printing results")
+print_2Ddecision(rbf_res, data, labels)
 ```
 
-![original](example/donut/original.png)
+![linear](example/iris/linear.png)
 
-```julia
-# Try with linear kernel
-# This is the classic LDA algorithm
-lin = lda(x, y)
-print_2Ddecision(lin, data)
-```
-
-![linear](example/donut/linear.png)
-
-```julia
-# Try with a RBF kernel and different sigmas
-rbf_res = lda(x, y, rbf, sigma)
-print_2Ddecision(res, data)
-```
-
-![rbf](example/donut/rbf0_02.png)
-![rbf](example/donut/rbfoverfit.png)
-![rbf](example/donut/rbf0_4.png)
-![rbf](example/donut/rbf.png)
+![linear](example/iris/rbf0_4.png)
