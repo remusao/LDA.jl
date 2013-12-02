@@ -35,7 +35,7 @@ data = rand(2, 1000) * 7
 plot(x = reshape(x[1, :], size(x, 2)), y = reshape(x[2, :], size(x, 2)), group = y, kind = :scatter)
 ```
 
-![original](example/original.png)
+![original](example/donut/original.png)
 
 ```julia
 # Try with linear kernel
@@ -44,7 +44,7 @@ lin = lda(x, y)
 print_2Ddecision(lin, data)
 ```
 
-![linear](example/linear.png)
+![linear](example/donut/linear.png)
 
 ```julia
 # Try with a RBF kernel and different sigmas
@@ -52,7 +52,7 @@ rbf_res = lda(x, y, rbf, sigma)
 print_2Ddecision(res, data)
 ```
 
-![rbf](example/rbf0_02.png)
-![rbf](example/rbfoverfit.png)
-![rbf](example/rbf0_4.png)
-![rbf](example/rbf.png)
+![rbf](example/donut/rbf0_02.png)
+![rbf](example/donut/rbfoverfit.png)
+![rbf](example/donut/rbf0_4.png)
+![rbf](example/donut/rbf.png)

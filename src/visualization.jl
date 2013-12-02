@@ -1,23 +1,20 @@
 
-function print_2Ddecision(lda::Lda, data::Matrix)
+function print_2Ddecision(lda::Lda, data::Matrix, labels = nothing)
 
     #
     # Output result
     #
     n = size(data, 2)
 
-    color = process(lda, data)
-    map!(color) do x
-        if x < 0
-            return 0
-        else
-            return 1
-        end
+    projection = process(lda, data, 2)
+
+    y = reshape(projection[2, :], n)
+    x = reshape(projection[1, :], n)
+
+    if labels == nothing
+        println(plot(x = x, y = y, kind = :scatter))
+    else
+        println(plot(x = x, y = y, group = labels, kind = :scatter))
     end
-
-    y = reshape(data[2, :], n)
-    x = reshape(data[1, :], n)
-
-    println(plot(x = x, y = y, group = color, kind = :scatter))
 end
 
