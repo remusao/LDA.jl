@@ -54,7 +54,7 @@ function lda(data::Matrix, labels::Vector, c::Integer = 2, kfun::Function = line
     end
 
     # Compute intraclass variance Sw
-    Sw = 0
+    Sw = Array(Float64, n, n)
     for k = 1:c
         Gk = G[:, labels .== k]
         Sw = Sw + Gk * (eye(Float64, nk[k]) - ones(Float64, nk[k], nk[k]) / nk[k]) * Gk'
@@ -65,11 +65,10 @@ function lda(data::Matrix, labels::Vector, c::Integer = 2, kfun::Function = line
     for i = 1:n
         indic[i, labels[i]] = 1 / nk[labels[i]]
     end
-    M1 = G * (indic - ones(Float64, n, c))
+    M1 = G * (indic - ones(Float64, n, c) / n)
     Sb = M1 * M1'
 
-    S, V = eig(inv(Sw) * Sb)
-    println(V[:, 1:2])
+    S, V = eig(inv(Sw + 0.1 * eye(n)) * Sb)
 
     return Lda(c, V, data, kernel)
 end

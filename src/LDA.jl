@@ -1,6 +1,7 @@
 module LDA
 
 using Vega
+using Gadfly
 
 include("kernel.jl")
 include("lda.jl")

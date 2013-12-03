@@ -1,5 +1,5 @@
 
-function print_2Ddecision(lda::Lda, data::Matrix, labels = nothing)
+function print_2Ddecision(lda::Lda, data::Matrix, name::String, labels = nothing)
 
     #
     # Output result
@@ -8,12 +8,13 @@ function print_2Ddecision(lda::Lda, data::Matrix, labels = nothing)
 
     projection = process(lda, data, 2)
 
-    y = reshape(projection[2, :], n)
-    x = reshape(projection[1, :], n)
+    x = reshape(projection[2, :], n)
+    y = reshape(projection[1, :], n)
 
     if labels == nothing
-        println(plot(x = x, y = y, kind = :scatter))
+        p = plot(x = x, y = y, Geom.point)
     else
-        println(plot(x = x, y = y, group = labels, kind = :scatter))
+        p = plot(x = x, y = y, color = labels, Geom.point)
     end
+    draw(PNG("test.png", 10inch, 10inch), p)
 end
